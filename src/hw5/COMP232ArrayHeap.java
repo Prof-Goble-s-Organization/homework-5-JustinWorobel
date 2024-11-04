@@ -91,7 +91,17 @@ public class COMP232ArrayHeap<K extends Comparable<K>, V> implements COMP232Prio
          * node up the tree.
 	 * I recommend creating a helper function to assist with the percolation.
          */
-        throw new UnsupportedOperationException("Not yet implemented");
+        tree.add(new HeapNode<> (key, value));
+
+        int curr = tree.size() -1;
+        int parent = getParentIndex(curr);
+
+        while (curr > 0 && tree.get(curr).key.compareTo(tree.get(parent).key)>0){
+            swap(curr, parent);
+
+            curr = parent;
+            parent = getParentIndex(curr);
+        }
     }
 
     /**
@@ -205,9 +215,25 @@ public class COMP232ArrayHeap<K extends Comparable<K>, V> implements COMP232Prio
      *          Thrown if the heap is empty
      */
     public void adjustPriority(V value, K newKey) {
-        // Intentionally not implemented -- see homework assignment
-        throw new UnsupportedOperationException("Not yet implemented.");
+        int target = -1;
+        int i = 0;
+        while(target < 0){
+            if(tree.get(i).value.equals(value)){
+                target = i;
+            }
+        }
 
+        if(target == -1){
+            return;
+        }
+
+        K oldK = tree.get(target).key;
+        tree.get(target).key = newKey;
+        if(newKey.compareTo(oldK) > 0){
+            percUp(target);
+        }else if (newKey.compareTo(oldK)<0){
+            trickleDown(target);
+        }
         /*
          * Find the node with the value -- Hint: Just search through the array!
          * Replace its key and then move the node to a valid location within the
@@ -216,6 +242,15 @@ public class COMP232ArrayHeap<K extends Comparable<K>, V> implements COMP232Prio
          * out of remove, then you can use those two methods to move the node to
          * a proper location.
          */
+    }
+
+    private void percUp(int index){
+        int parent =getParentIndex(index);
+        while(index > 0 && tree.get(index).key.compareTo(tree.get(parent).key)>0);
+        swap(index, parent);
+        index = parent;
+        parent = getParentIndex(index);
+
     }
 
     /**

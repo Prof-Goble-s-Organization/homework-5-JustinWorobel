@@ -100,16 +100,37 @@ public class COMP232LinkedBinarySearchTree<K extends Comparable<K>, V> extends C
 	 * {@inheritDoc}
 	 */
 	public V get(K key) {
-		// Intentionally not implemented - see homework assignment.
-		throw new UnsupportedOperationException("Not yet implemented");
+		return getHelper(root, key);
+	}
+
+	private V getHelper(BTNode<K, V> subRoot, K key){
+		if(subRoot == null){
+			return null;
+		}else if(subRoot.key.equals(key)){
+			return subRoot.value;
+		}else if (key.compareTo(subRoot.key)<0){
+			return getHelper(subRoot.left, key);
+		}else{
+			return getHelper(subRoot.right, key);
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void set(K key, V value) {
-		// Intentionally not implemented - see homework assignment.
-		throw new UnsupportedOperationException("Not yet implemented");
+		BTNode<K, V> curr = root;
+
+		while(curr != null){
+			if(key.equals(curr.key)){
+				curr.value = value;
+				return;
+			}else if(key.compareTo(curr.key) <0){
+				curr = curr.left;
+			}else{
+				curr = curr.right;
+			}
+		}
 	}
 
 	/**
@@ -170,10 +191,57 @@ public class COMP232LinkedBinarySearchTree<K extends Comparable<K>, V> extends C
 	 * {@inheritDoc}
 	 */
 	public V remove(K key) {
-		// Intentionally not implemented - see homework assignment.
-		throw new UnsupportedOperationException("Not yet implemented");
+		BTNode<K, V> curr = root;
+		BTNode<K, V> parent = null;
+
+		while(curr != null){
+			if(key.equals(curr.key)){
+				V returnVal = curr.value;
+
+				//removing leaf
+				if(curr.left == null && curr.right == null){
+					if(parent == null){
+						root = null;
+					}else if( parent == curr){
+						parent.left = null;
+					}else{
+						parent.right = null;
+					}
+					}
+					// removing node with one child
+				else if(curr.left == null || curr.right == null){
+					BTNode<K, V> child = (curr.left != null) ? curr.left : curr.right;
+					if(parent == null){
+						root = child;
+					}else if(parent.left == curr){
+						parent.left = child;						
+					}
+					//node with two children
+				}else{
+					BTNode<K, V> smallest = findSmallest(curr.right);
+					curr.key = smallest.key;
+					curr.value = smallest.value;
+
+					remove(smallest.key);
+				}
+				return returnVal;
+			}else if(key.compareTo(curr.key) <0){
+				parent = curr;
+				curr = curr.left;
+			}else{
+				parent = curr;
+				curr= curr.right;
+			}
+		}
+		throw new IllegalArgumentException();
 	}
 
+	private BTNode<K, V> findSmallest(BTNode<K, V> sub){
+		while(sub.left != null){
+			sub = sub.left;
+		}
+		return sub;
+	}
 	/*
 	 * Helper method that verifies the BST property of this tree by traversing
 	 * the tree and verifying that at each node the key of the left child is <
